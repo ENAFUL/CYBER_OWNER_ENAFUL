@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Digital Card Wallet</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f4f4f9; }
+        .card-box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        input { display: block; margin: 10px 0; padding: 10px; width: 90%; }
+        .card-item { border-bottom: 1px solid #ccc; padding: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="card-box">
+        <h2>Add New Document/Card</h2>
+        <input type="text" id="cardNum" placeholder="Enter Number">
+        <input type="file" id="cardPhoto" accept="image/*">
+        <button onclick="save()">Save Card</button>
+    </div>
+
+    <h3>Saved Cards</h3>
+    <div id="cardList"></div>
+
+    <script src="CardManager.js"></script>
+    <script>
+        const manager = new CardManager();
+
+        function save() {
+            const num = document.getElementById('cardNum').value;
+            const fileInput = document.getElementById('cardPhoto');
+            
+            // ছবিকে Base64 এ রূপান্তর করা
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const card = {
+                    number: num,
+                    type: manager.getCardType(num),
+                    image: e.target.result
+                };
+                manager.saveCard(card);
+                displayCards();
+            };
+            if(fileInput.files[0]) reader.readAsDataURL(fileInput.files[0]);
+        }
+
+        function displayCards() {
+            const list = document.getElementById('cardList');
+            list.innerHTML = manager.getAllCards().map(c => `
+                <div class="card-item">
+                    <img src="${c.image}" width="50"> <strong>${c.type}</strong>: ${c.number}
+                </div>
+            `).join('');
+        }
+
+        displayCards();
+    </script>
+</body>
+</html>
